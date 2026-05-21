@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VisionTrack - Object Interaction Analyzer</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="glass-bg"></div>
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+
+    <div class="app-container">
+        <!-- Sidebar Tasks Pane -->
+        <aside class="sidebar glass-panel">
+            <div class="brand">
+                <i class="fa-solid fa-wand-magic-sparkles brand-icon"></i>
+                <div class="brand-text">
+                    <h1>VisionTrack</h1>
+                    <span>Object & Interaction AI</span>
+                </div>
+            </div>
+
+            <div class="upload-btn-container">
+                <label for="video-upload" class="btn btn-primary btn-block">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Analyze New Video
+                </label>
+                <input type="file" id="video-upload" accept="video/mp4,video/quicktime,video/x-matroska,video/x-msvideo" style="display: none;">
+            </div>
+
+            <div class="tasks-section">
+                <div class="section-header">
+                    <h2>Analysis Queue</h2>
+                    <button id="refresh-tasks" class="btn-icon" title="Refresh Queue"><i class="fa-solid fa-rotate"></i></button>
+                </div>
+                <div class="tasks-list" id="tasks-list">
+                    <!-- Loaded dynamically via js -->
+                    <div class="empty-state-sidebar">
+                        <i class="fa-solid fa-list-check"></i>
+                        <p>No video tasks uploaded yet.</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Visualizer Pane -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="main-header glass-panel">
+                <div class="header-title">
+                    <h2 id="active-task-title">Interaction Analyzer Dashboard</h2>
+                    <span id="active-task-subtitle">Upload a video or select an existing task from the sidebar queue.</span>
+                </div>
+                <div class="header-actions">
+                    <span class="badge badge-indigo" id="active-task-status" style="display:none;">PENDING</span>
+                </div>
+            </header>
+
+            <!-- Dashboard States -->
+            <div class="dashboard-body">
+                <!-- State 1: Upload / Welcome Screen -->
+                <div id="welcome-state" class="glass-panel state-view active">
+                    <div class="welcome-box">
+                        <div class="upload-dropzone" id="upload-dropzone">
+                            <div class="dropzone-icon">
+                                <i class="fa-solid fa-photo-film"></i>
+                            </div>
+                            <h3>Drag & Drop Video File</h3>
+                            <p>Supports MP4, MOV, AVI, MKV up to 100MB</p>
+                            <span class="divider">or</span>
+                            <button class="btn btn-secondary" onclick="document.getElementById('video-upload').click()">Browse Files</button>
+                        </div>
+                        <div class="feature-pitch">
+                            <div class="feature-card">
+                                <i class="fa-solid fa-magnifying-glass-location"></i>
+                                <h4>YOLO Tracking</h4>
+                                <p>Locate and trace objects with ByteTrack across frames seamlessly.</p>
+                            </div>
+                            <div class="feature-card">
+                                <i class="fa-solid fa-child-reaching"></i>
+                                <h4>Pose Interaction</h4>
+                                <p>Detect human skeletons and wrists to calculate proximity intersections.</p>
+                            </div>
+                            <div class="feature-card">
+                                <i class="fa-solid fa-chart-gantt"></i>
+                                <h4>Visual Timelines</h4>
+                                <p>Render horizontal Gantt-style charts of motion, displacement, and hand interaction.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- State 2: Processing Screen -->
+                <div id="processing-state" class="glass-panel state-view">
+                    <div class="processing-box">
+                        <div class="spinner-container">
+                            <div class="spinner"></div>
+                            <div class="spinner-percentage" id="processing-percentage">0%</div>
+                        </div>
+                        <h3>Analyzing Content Pipeline...</h3>
+                        <p>Locating key joints, detecting active boxes, and computing smoothed coordinates.</p>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-fill" id="processing-bar" style="width: 0%;"></div>
+                        </div>
+                        <span class="processing-subtext">This might take a minute depending on video duration.</span>
+                    </div>
+                </div>
+
+                <!-- State 3: Failure Screen -->
+                <div id="failed-state" class="glass-panel state-view">
+                    <div class="failed-box">
+                        <i class="fa-solid fa-circle-exclamation error-icon"></i>
+                        <h3>Task Processing Failed</h3>
+                        <p class="error-msg" id="failed-reason">Unknown error occurred during processing.</p>
+                        <button class="btn btn-primary" onclick="document.getElementById('video-upload').click()">Try Another Video</button>
+                    </div>
+                </div>
+
+                <!-- State 4: Complete Visualization Screen -->
+                <div id="results-state" class="state-view">
+                    <!-- Column Grid: Video + Catalog -->
+                    <div class="results-grid">
+                        <!-- Custom Video Player Panel -->
+                        <div class="video-panel glass-panel">
+                            <h3><i class="fa-solid fa-play"></i> Input Video</h3>
+                            <div class="video-wrapper">
+                                <video id="results-video" controls preload="auto">
+                                    Your browser does not support HTML5 video playing.
+                                </video>
+                            </div>
+                            <!-- Metadata Table -->
+                            <div class="metadata-grid" id="metadata-grid">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Object Catalog Panel -->
+                        <div class="catalog-panel glass-panel">
+                            <div class="panel-header">
+                                <h3><i class="fa-solid fa-boxes-stacked"></i> Objects Catalogue</h3>
+                                <span class="badge badge-green" id="objects-count">0 Detected</span>
+                            </div>
+                            <div class="objects-list-wrapper" id="objects-list-wrapper">
+                                <!-- Loaded dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row Grid: Gantt Timeline -->
+                    <div class="timeline-panel glass-panel">
+                        <div class="timeline-header">
+                            <h3><i class="fa-solid fa-chart-gantt"></i> Interactive Temporal Timeline</h3>
+                            <div class="timeline-legend">
+                                <span class="legend-item"><span class="legend-dot stationary"></span>Stationary</span>
+                                <span class="legend-item"><span class="legend-dot moving"></span>Moving</span>
+                                <span class="legend-item"><span class="legend-dot interaction"></span>Interaction</span>
+                            </div>
+                        </div>
+                        <div class="timeline-container" id="timeline-container">
+                            <!-- Gantt rows generated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Row Grid: Keyframes & JSON Tabs -->
+                    <div class="bottom-panel-grid">
+                        <!-- Keyframes Gallery -->
+                        <div class="keyframes-panel glass-panel">
+                            <h3><i class="fa-solid fa-camera-retro"></i> Extracted Transition Keyframes</h3>
+                            <div class="keyframes-gallery" id="keyframes-gallery">
+                                <!-- Loaded dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- JSON Raw Output -->
+                        <div class="json-panel glass-panel">
+                            <div class="json-header">
+                                <h3><i class="fa-solid fa-code"></i> Output Payload JSON</h3>
+                                <button class="btn btn-secondary btn-sm" id="copy-json" title="Copy JSON payload">
+                                    <i class="fa-solid fa-copy"></i> Copy
+                                </button>
+                            </div>
+                            <pre class="json-container"><code id="json-block"></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Custom Script -->
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

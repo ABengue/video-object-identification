@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Virtual environment
+.venv/
+
+# macOS
+.DS_Store
+
+# YOLO model weights (auto-downloaded by run.sh on first launch)
+*.pt
+
+# Runtime database (regenerated on startup)
+app/tasks.db
+
+# Uploaded video files and generated task outputs (runtime data)
+app/static/uploads/
+app/static/tasks/
+Object Identification Assessment.pdf
