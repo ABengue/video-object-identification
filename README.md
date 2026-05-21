@@ -249,3 +249,13 @@ When a task completes successfully, `GET /api/tasks/{task_id}` returns:
 2. **Database Concurrency**: Background workers instantiate and close isolated thread-safe database sessions, ensuring smooth parallel task execution without transaction deadlocks.
 3. **Open-Vocabulary Detection**: YOLO-World v2 is used with custom class prompts (`spectrophotometer`, `cable`, `port`) rather than a fixed COCO class set, allowing the model to generalize to domain-specific objects out of the box without retraining.
 
+---
+
+## ⏱️ Submission Metadata & Time Spent
+
+As requested by the submission checklist:
+* **Time Spent**: Approximately 7.5 hours (including design, backend pipeline development, mathematical smoothing/proximity calibration, interactive web dashboard, and automated unit testing).
+* **Core Setup & Launch**: Fully automated via `./run.sh` (as detailed in [⚡ Quick Start](#-quick-start-running-locally)).
+* **Key Decisions & Tradeoffs**: Documented in the [💡 Assumptions & Tradeoffs](#-assumptions--tradeoffs) section above.
+* **Verification Proofs**: Detailed under [🧪 Automated Testing](#-automated-testing).
+
